@@ -52,8 +52,11 @@ class Post(db.Model):
     def validate_title(self, key, title):
         if not title and len(title.strip()) == 0:
             raise ValueError("Title is requered")
-        else:
-            return title
+
+        if not self.__is_title_clickable(title):
+            raise ValueError("Title does not contain clickable phrase")
+
+        return title
 
     @validates("content")
     def validate_content(self, key, content):
@@ -75,6 +78,14 @@ class Post(db.Model):
             raise ValueError("Post category is either Fiction or Non-Fiction.")
         else:
             return category
+
+    def __is_title_clickable(self, title):
+        clickable_strings = ("Won't Believe", "Secret", "Top", "Guess")
+        is_clickable = False
+        for s in clickable_strings:
+            if s in title:
+                is_clickable = True
+        return is_clickable
 
     def __repr__(self):
         return f"Post(id={self.id}, title={self.title} content={self.content}, summary={self.summary})"
